@@ -1,6 +1,7 @@
 import thread.FileProcessorThread;
 
 import java.io.File;
+import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) {
@@ -9,8 +10,10 @@ public class Main {
         File[] txtFiles = folder.listFiles((dir, name) -> name.endsWith(".txt"));
 
         if (txtFiles != null) {
+            Semaphore semaphore = new Semaphore(10);
+
             for (File file : txtFiles) {
-                FileProcessorThread fileProcessorThread = new FileProcessorThread(file);
+                FileProcessorThread fileProcessorThread = new FileProcessorThread(file, semaphore);
                 fileProcessorThread.start();
             }
         } else {

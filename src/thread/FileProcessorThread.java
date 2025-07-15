@@ -3,21 +3,33 @@ package thread;
 import worker.Worker;
 
 import java.io.File;
+import java.util.concurrent.Semaphore;
 
 public class FileProcessorThread extends Thread {
     private final File file;
+    private final Semaphore semaphore;
 
-    public FileProcessorThread(File file) {
+    public FileProcessorThread(File file, Semaphore semaphore) {
         this.file = file;
+        this.semaphore = semaphore;
     }
 
     @Override
     public void run() {
-        System.out.println("[" + Thread.currentThread().getName() + "] Started processing: " + file.getName());
+        try {
+            semaphore.acquire();
 
-        Worker worker = new Worker();
-        worker.process(file);
+            int currentCount = ThreadMonitor.activeThreads.incrementAndGet();
+            System.out.println("[" + getName() + "] Started " + file.getName() + " | Active threads: " + currentCount + "/10");
 
-        System.out.println("[" + Thread.currentThread().getName() + "] Finished processing: " + file.getName());
+            Worker worker = new Worker();
+            worker.process(file);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaphore.release();
+            int currentCount = ThreadMonitor.activeThreads.decrementAndGet();
+            System.out.println("[" + getName() + "] Finished " + file.getName() + " | Active threads: " + currentCount + "/10");
+        }
     }
 }
