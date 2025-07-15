@@ -1,6 +1,8 @@
+import thread.FileArchiverZip_UnZip;
 import thread.FileProcessorThread;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.concurrent.Semaphore;
 
 public class Main {
@@ -15,6 +17,17 @@ public class Main {
             for (File file : txtFiles) {
                 FileProcessorThread fileProcessorThread = new FileProcessorThread(file, semaphore);
                 fileProcessorThread.start();
+            }
+            try {
+                FileArchiverZip_UnZip zipThread = new FileArchiverZip_UnZip (
+                        Paths.get("input"),
+                        Paths.get("output/files.zip"),
+                        semaphore
+                );
+                zipThread.start();
+                zipThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         } else {
             System.out.println("No files found in input folder.");
