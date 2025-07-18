@@ -23,6 +23,7 @@ public class FileArchiverUnzip extends Thread {
     }
     @Override
     public void run() {
+        long startTime = System.nanoTime(); // Unzip işlemi başlangıcı
         try {
             semaphore.acquire();
             int activeCount = ThreadMonitor.activeThreads.incrementAndGet();
@@ -30,8 +31,12 @@ public class FileArchiverUnzip extends Thread {
             unzipFiles();
             System.out.println("[" + getName() + "] Unzip completed -> " + outputDirectory);
         } catch (InterruptedException | IOException e) {
+            System.err.println("[" + getName() + "] HATA: Unzip işlemi sırasında hata oluştu: " + e.getMessage());
             e.printStackTrace();
         } finally {
+            long endTime = System.nanoTime(); // Unzip işlemi bitişi
+            long duration = endTime - startTime;
+            System.out.println("[" + getName() + "] Unzip işlemi süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             semaphore.release();
             int activeCount = ThreadMonitor.activeThreads.decrementAndGet();
             System.out.println("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10");

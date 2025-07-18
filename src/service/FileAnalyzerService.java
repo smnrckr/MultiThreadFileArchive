@@ -9,6 +9,10 @@ public class FileAnalyzerService {
 
     public FileStatistics analyze(File file) {
         String[] lines = readerService.readAllLines(file);
+        if (lines == null) {
+            System.err.println("Analiz atlandı: " + file.getName() + " okunamadığı için analiz yapılmadı.");
+            return null;
+        }
         int lineCount = lines.length; //satır sayısı
         int charCount = 0;
 

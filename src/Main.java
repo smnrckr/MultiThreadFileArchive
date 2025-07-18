@@ -12,6 +12,8 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) {
+        long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı
+
         File folder = new File("input");
 
         File[] txtFiles = folder.listFiles((dir, name) -> name.endsWith(".txt"));
@@ -37,6 +39,7 @@ public class Main {
             ResultCollector.printAllResults();
 
             // Zip ve Unzip işlemleri
+            long zipStart = System.nanoTime();
             try {
                 FileArchiverZip zipThread = new FileArchiverZip(
                         Paths.get("input"),
@@ -46,7 +49,16 @@ public class Main {
                 );
                 zipThread.start();
                 zipThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("HATA: Zip thread beklenirken hata oluştu: " + e.getMessage());
+                e.printStackTrace();
+            }
+            long zipEnd = System.nanoTime();
+            long zipDuration = zipEnd - zipStart;
+            System.out.println("Toplam zip işlemi süresi: " + zipDuration + " ns (" + (zipDuration / 1_000_000.0) + " ms)");
 
+            long unzipStart = System.nanoTime();
+            try {
                 FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                         Paths.get("output/files.zip"),
                         Paths.get("unzipped_output"),
@@ -55,8 +67,15 @@ public class Main {
                 unzipThread.start();
                 unzipThread.join();
             } catch (InterruptedException e) {
+                System.err.println("HATA: Unzip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
             }
+            long unzipEnd = System.nanoTime();
+            long unzipDuration = unzipEnd - unzipStart;
+            System.out.println("Toplam unzip işlemi süresi: " + unzipDuration + " ns (" + (unzipDuration / 1_000_000.0) + " ms)");
+            long programEnd = System.nanoTime();
+            long programDuration = programEnd - programStart;
+            System.out.println("Programın toplam çalışma süresi: " + programDuration + " ns (" + (programDuration / 1_000_000.0) + " ms)");
 
         } else {
             System.out.println("No files found in input folder.");
