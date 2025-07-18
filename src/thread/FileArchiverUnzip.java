@@ -1,5 +1,6 @@
 package thread;
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,18 +16,24 @@ public class FileArchiverUnzip extends Thread {
     private final Path zipFile;
     private final Path outputDirectory;
     private final Semaphore semaphore;
+    private final JTextArea statusTextArea;
 
-    public FileArchiverUnzip(Path zipFile, Path outputDirectory, Semaphore semaphore){
+    public FileArchiverUnzip(Path zipFile, Path outputDirectory, Semaphore semaphore, JTextArea statusTextArea){
         this.zipFile = zipFile;
         this.outputDirectory = outputDirectory;
         this.semaphore = semaphore;
+        this.statusTextArea = statusTextArea;
     }
     @Override
     public void run() {
         try {
             semaphore.acquire();
             int activeCount = ThreadMonitor.activeThreads.incrementAndGet();
-            System.out.println("[" + getName() + "] Unzip thread started | Active threads: " + activeCount + "/10");
+            SwingUtilities.invokeLater(() -> {
+                statusTextArea.append("[" + getName() + "] Unzip thread started | Active threads: " + activeCount + "/10\n");
+                statusTextArea.setCaretPosition(statusTextArea.getDocument().getLength());
+            });
+            Thread.sleep(1000);
             unzipFiles();
             System.out.println("[" + getName() + "] Unzip completed -> " + outputDirectory);
         } catch (InterruptedException | IOException e) {
@@ -34,7 +41,10 @@ public class FileArchiverUnzip extends Thread {
         } finally {
             semaphore.release();
             int activeCount = ThreadMonitor.activeThreads.decrementAndGet();
-            System.out.println("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10");
+            SwingUtilities.invokeLater(() -> {
+                statusTextArea.append("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10\n");
+                statusTextArea.setCaretPosition(statusTextArea.getDocument().getLength());
+            });
         }
     }
     private void unzipFiles() throws IOException {

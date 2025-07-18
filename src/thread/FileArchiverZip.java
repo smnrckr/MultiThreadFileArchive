@@ -1,5 +1,6 @@
 package thread;
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,20 +16,27 @@ public class FileArchiverZip  extends Thread {
     private final Path outputZip;
     private final Semaphore semaphore;
     private final boolean deleteAfterZip;
+    private final JTextArea statusTextArea;
     public static final int BUFFER_SIZE = 4096;
 
-    public FileArchiverZip(Path inputDirectory, Path outputZip, Semaphore semaphore, boolean deleteAfterZip) {
+
+    public FileArchiverZip(Path inputDirectory, Path outputZip, Semaphore semaphore, boolean deleteAfterZip, JTextArea statusTextArea) {
         this.inputDirectory = inputDirectory;
         this.outputZip = outputZip;
         this.semaphore = semaphore;
         this.deleteAfterZip=deleteAfterZip;
+        this.statusTextArea = statusTextArea;
     }
     @Override
     public void run() {
         try {
             semaphore.acquire();
             int currentCount = ThreadMonitor.activeThreads.incrementAndGet();
-            System.out.println("[" + getName() + "] Zip thread started | Active threads: " + currentCount + "/10");
+            SwingUtilities.invokeLater(() -> {
+                statusTextArea.append("[" + getName() + "] Zip thread started | Active threads: " + currentCount + "/10\n");
+                statusTextArea.setCaretPosition(statusTextArea.getDocument().getLength());
+            });
+            Thread.sleep(1000);
             List<Path> file_list = zipFiles();
             if (deleteAfterZip) {
                 deleteFileFromZip(file_list);

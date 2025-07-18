@@ -1,3 +1,0 @@
-File 2 reporting in.
-Multithreading makes this faster.
-Java threads are lightweight.
