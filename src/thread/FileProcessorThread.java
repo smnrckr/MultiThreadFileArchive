@@ -16,6 +16,7 @@ public class FileProcessorThread extends Thread {
 
     @Override
     public void run() {
+        long startTime = System.nanoTime(); // Dosya analizi başlangıcı
         try {
             // izin al
             semaphore.acquire();
@@ -37,6 +38,9 @@ public class FileProcessorThread extends Thread {
 
             // aktif thread sayısını azalt
             int currentCount = ThreadMonitor.activeThreads.decrementAndGet();
+            long endTime = System.nanoTime(); // Dosya analizi bitişi
+            long duration = endTime - startTime;
+            System.out.println("[" + getName() + "] " + file.getName() + " analiz süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             System.out.println("[" + getName() + "] Finished " + file.getName() +
                     " | Active threads: " + currentCount + "/10");
         }

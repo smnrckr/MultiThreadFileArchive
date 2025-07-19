@@ -16,13 +16,14 @@ public class FileArchiverUnzip extends Thread {
     private final Path outputDirectory;
     private final Semaphore semaphore;
 
-    public FileArchiverUnzip(Path zipFile, Path outputDirectory, Semaphore semaphore) {
+    public FileArchiverUnzip(Path zipFile, Path outputDirectory, Semaphore semaphore){
         this.zipFile = zipFile;
         this.outputDirectory = outputDirectory;
         this.semaphore = semaphore;
     }
     @Override
     public void run() {
+        long startTime = System.nanoTime(); // Unzip işlemi başlangıcı
         try {
             // Thread başlarken semafor al
             semaphore.acquire();
@@ -37,6 +38,9 @@ public class FileArchiverUnzip extends Thread {
             e.printStackTrace();
         } finally {
             // İşlem bitince semaforu serbest bırak
+            long endTime = System.nanoTime(); // Unzip işlemi bitişi
+            long duration = endTime - startTime;
+            System.out.println("[" + getName() + "] Unzip işlemi süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             semaphore.release();
             int activeCount = ThreadMonitor.activeThreads.decrementAndGet();
             System.out.println("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10");
