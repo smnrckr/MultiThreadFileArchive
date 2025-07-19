@@ -13,9 +13,7 @@ import java.util.concurrent.Semaphore;
 public class Main {
     public static void main(String[] args) {
         long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı
-
         File folder = new File("input");
-
         File[] txtFiles = folder.listFiles((dir, name) -> name.endsWith(".txt"));
 
         if (txtFiles != null) {
@@ -35,20 +33,19 @@ public class Main {
                     e.printStackTrace();
                 }
             }
-
             ResultCollector.printAllResults();
-
             // Zip ve Unzip işlemleri
             long zipStart = System.nanoTime();
             try {
-                FileArchiverZip zipThread = new FileArchiverZip(
+                // Zip thread class'ının nesnesi oluşturulur.
+                FileArchiverZip zipThread0 = new FileArchiverZip(
                         Paths.get("input"),
                         Paths.get("output/files.zip"),
                         semaphore,
-                        true
+                        true // zipten sonra silmesi için gerekli olan parametre
                 );
-                zipThread.start();
-                zipThread.join();
+                zipThread0.start();
+                zipThread0.join();
             } catch (InterruptedException e) {
                 System.err.println("HATA: Zip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
@@ -59,6 +56,7 @@ public class Main {
 
             long unzipStart = System.nanoTime();
             try {
+                // Unzip thread class'ının nesnesi oluşturulur.
                 FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                         Paths.get("output/files.zip"),
                         Paths.get("unzipped_output"),
