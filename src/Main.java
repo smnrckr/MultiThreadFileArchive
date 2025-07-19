@@ -2,81 +2,54 @@ import thread.FileArchiverUnzip;
 import thread.FileArchiverZip;
 import thread.FileProcessorThread;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        JTextArea textArea_thread = new JTextArea();
-        textArea_thread.setEditable(false);
-        textArea_thread.setBorder(BorderFactory.createTitledBorder("Thread Durumları"));
-        JTextArea textArea_log = new JTextArea();
-        textArea_log.setEditable(false);
-        textArea_log.setBorder(BorderFactory.createTitledBorder("Log Durumları"));
-
-        JScrollPane scrollPane_thread = new JScrollPane(textArea_thread);
-        JScrollPane scrollPane_log = new JScrollPane(textArea_log);
-
-        JPanel panel = new JPanel(new GridLayout(1, 2));
-        panel.add(scrollPane_thread);
-        panel.add(scrollPane_log);
-
-        JFrame frame = new JFrame("Dosya Analiz Uygulaması");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600);
-        frame.add(panel);
-        frame.setVisible(true);
-
-        PrintStream printStream = new PrintStream(new OutputStream() {
-            @Override
-            public void write(int b) {
-                SwingUtilities.invokeLater(()-> {
-                    textArea_log.append(String.valueOf((char) b));
-                    textArea_log.setCaretPosition(textArea_log.getDocument().getLength());
-                });
-            }
-        }, true);
-        System.setOut(printStream);
-        System.setErr(printStream);
-
         File folder = new File("input");
-
         File[] txtFiles = folder.listFiles((dir, name) -> name.endsWith(".txt"));
 
         if (txtFiles != null) {
             Semaphore semaphore = new Semaphore(10);
 
+            // Tüm dosyalar için thread listesi oluştur
+            List<FileProcessorThread> threadList = new ArrayList<>();
+
             for (File file : txtFiles) {
-                FileProcessorThread fileProcessorThread = new FileProcessorThread(
-                        file,
-                        semaphore,
-                        textArea_thread
-                );
+                FileProcessorThread fileProcessorThread = new FileProcessorThread(file, semaphore);
                 fileProcessorThread.start();
-                fileProcessorThread.join();
+                threadList.add(fileProcessorThread);
             }
+
+            // Hepsi bitene kadar bekle
+            for (FileProcessorThread t : threadList) {
+                t.join();
+            }
+
+            // Zip thread class'ının nesnesi oluşturulur.
             FileArchiverZip zipThread = new FileArchiverZip(
                     Paths.get("input"),
                     Paths.get("output/files.zip"),
                     semaphore,
-                    true,
-                    textArea_thread
+                    true // zipten sonra silmesi için gerekli olan parametre
             );
             zipThread.start();
             zipThread.join();
+
+            // Unzip thread class'ının nesnesi oluşturulur.
             FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                     Paths.get("output/files.zip"),
                     Paths.get("unzipped_output"),
-                    semaphore,
-                    textArea_thread
+                    semaphore
             );
             unzipThread.start();
             unzipThread.join();
+
+            System.out.println("Tüm işlemler başarıyla tamamlandı.");
         } else {
             System.out.println("No files found in input folder.");
         }
