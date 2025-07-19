@@ -17,18 +17,18 @@ public class ResultCollector {
         int totalLines = 0;
         int totalChars = 0;
 
-        System.out.println("\n📄 Dosya Analiz Sonuçları:");
+        System.out.println("\n📄 File Analysis Results");
 
         for (Map.Entry<String, FileStatistics> entry : results.entrySet()) {
             String fileName = entry.getKey();
             FileStatistics stats = entry.getValue();
 
-            System.out.println(fileName + " - " + stats.getLineCount() + " satır / " + stats.getCharacterCount() + " karakter");
+            System.out.println(fileName + " - " + stats.getLineCount() + " lines / " + stats.getCharacterCount() + " characters");
 
             totalLines += stats.getLineCount();
             totalChars += stats.getCharacterCount();
         }
 
-        System.out.println("\n🧾 Toplam: " + totalLines + " satır / " + totalChars + " karakter");
+        System.out.println("Total: " + totalLines + " lines / " + totalChars + " characters");
     }
 }

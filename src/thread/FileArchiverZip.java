@@ -41,7 +41,7 @@ public class FileArchiverZip  extends Thread {
         } finally {
             long endTime = System.nanoTime(); // Zip işlemi bitişi
             long duration = endTime - startTime;
-            System.out.println("[" + getName() + "] Zip işlemi süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
+            System.out.println("[" + getName() + "] Zip duration: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             semaphore.release();
             int currentCount = ThreadMonitor.activeThreads.decrementAndGet();
             System.out.println("[" + getName() + "] Zip thread finished | Active threads: " + currentCount + "/10");

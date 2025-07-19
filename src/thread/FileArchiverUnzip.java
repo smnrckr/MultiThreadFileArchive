@@ -36,7 +36,7 @@ public class FileArchiverUnzip extends Thread {
         } finally {
             long endTime = System.nanoTime(); // Unzip işlemi bitişi
             long duration = endTime - startTime;
-            System.out.println("[" + getName() + "] Unzip işlemi süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
+            System.out.println("[" + getName() + "] Unzip duration: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             semaphore.release();
             int activeCount = ThreadMonitor.activeThreads.decrementAndGet();
             System.out.println("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10");
@@ -52,11 +52,11 @@ public class FileArchiverUnzip extends Thread {
                 Path filePath = outputDirectory.resolve(zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     Files.createDirectories(filePath);
-                    System.out.println(" [" + getName() + "] Created directory: " + filePath);
+                    System.out.println("[" + getName() + "] Created directory: " + filePath);
                 } else {
                     Files.createDirectories(filePath.getParent());
                     copyFiles(zipInputStream, filePath);
-                    System.out.println(" [" + getName() + "] Created directory: " + filePath);
+                    System.out.println("[" + getName() + "] Created directory: " + filePath);
                 }
                 zipInputStream.closeEntry();
             }

@@ -32,7 +32,7 @@ public class FileProcessorThread extends Thread {
             int currentCount = ThreadMonitor.activeThreads.decrementAndGet();
             long endTime = System.nanoTime(); // Dosya analizi bitişi
             long duration = endTime - startTime;
-            System.out.println("[" + getName() + "] " + file.getName() + " analiz süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
+            System.out.println("[" + getName() + "] " + file.getName() + " analysis duration: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             System.out.println("[" + getName() + "] Finished " + file.getName() + " | Active threads: " + currentCount + "/10");
         }
     }
