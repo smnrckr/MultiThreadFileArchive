@@ -12,7 +12,7 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) {
-        long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı
+        long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı (başlangıç zamanı alınır)
 
         File folder = new File("input");
 
@@ -39,7 +39,7 @@ public class Main {
             ResultCollector.printAllResults();
 
             // Zip ve Unzip işlemleri
-            long zipStart = System.nanoTime();
+            long zipStart = System.nanoTime(); // Zip işlemi başlangıç zamanı alınır
             try {
                 FileArchiverZip zipThread = new FileArchiverZip(
                         Paths.get("input"),
@@ -53,11 +53,11 @@ public class Main {
                 System.err.println("HATA: Zip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
             }
-            long zipEnd = System.nanoTime();
-            long zipDuration = zipEnd - zipStart;
+            long zipEnd = System.nanoTime(); // Zip işlemi bitiş zamanı alınır
+            long zipDuration = zipEnd - zipStart; // Zip işlemi süresi hesaplanır
             System.out.println("Toplam zip işlemi süresi: " + zipDuration + " ns (" + (zipDuration / 1_000_000.0) + " ms)");
 
-            long unzipStart = System.nanoTime();
+            long unzipStart = System.nanoTime(); // Unzip işlemi başlangıç zamanı alınır
             try {
                 FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                         Paths.get("output/files.zip"),
@@ -70,11 +70,11 @@ public class Main {
                 System.err.println("HATA: Unzip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
             }
-            long unzipEnd = System.nanoTime();
-            long unzipDuration = unzipEnd - unzipStart;
+            long unzipEnd = System.nanoTime(); // Unzip işlemi bitiş zamanı alınır
+            long unzipDuration = unzipEnd - unzipStart; // Unzip işlemi süresi hesaplanır
             System.out.println("Toplam unzip işlemi süresi: " + unzipDuration + " ns (" + (unzipDuration / 1_000_000.0) + " ms)");
-            long programEnd = System.nanoTime();
-            long programDuration = programEnd - programStart;
+            long programEnd = System.nanoTime(); // Programın toplam çalışma süresi bitiş zamanı alınır
+            long programDuration = programEnd - programStart; // Programın toplam çalışma süresi hesaplanır
             System.out.println("Programın toplam çalışma süresi: " + programDuration + " ns (" + (programDuration / 1_000_000.0) + " ms)");
 
         } else {

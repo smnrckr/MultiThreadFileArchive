@@ -9,6 +9,13 @@ import util.SafeFileUtils;
 
 public class FileReaderService {
 
+    /**
+     * Dosyadaki tüm satırları okur. Okuma işlemi için SafeFileUtils kullanılır,
+     * böylece dosya okuma sırasında oluşabilecek hatalar güvenli şekilde yakalanır ve yönetilir.
+     *
+     * @param file Okunacak dosya
+     * @return Satırların dizisi veya hata durumunda null
+     */
     public String[] readAllLines(File file) {
         List<String> lines = SafeFileUtils.readAllLinesSafe(file);
         if (lines == null) {
