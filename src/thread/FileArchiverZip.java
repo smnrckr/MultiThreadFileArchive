@@ -1,5 +1,6 @@
 package thread;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,9 +11,9 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import model.FileStatistics;
+import service.FileAnalyzerService;
 
 public class FileArchiverZip extends Thread {
     private final Path inputDirectory;
@@ -23,6 +24,7 @@ public class FileArchiverZip extends Thread {
 
     // Burada bu sınıf içindeki thread-safe map ile analiz sonuçlarını tutuyoruz
     private static final ConcurrentHashMap<String, FileStatistics> results = new ConcurrentHashMap<>();
+    private final FileAnalyzerService analyzerService = new FileAnalyzerService(); // Servisi kullanıyoruz
 
 
     public FileArchiverZip(Path inputDirectory, Path outputZip, Semaphore semaphore, boolean deleteAfterZip) {
@@ -106,12 +108,13 @@ public class FileArchiverZip extends Thread {
         }
     }
     // Her dosyanın satır ve karakter sayısını hesaplar
-    private void analyzeFiles(List<Path> files) throws IOException {
-        for (Path file : files) {
-            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
-            int lineCount = lines.size();
-            int charCount = lines.stream().mapToInt(String::length).sum();
-            results.put(file.getFileName().toString(), new FileStatistics(lineCount, charCount));  // ✔ doğru olan bu
+    private void analyzeFiles(List<Path> files) {
+        for (Path path : files) {
+            File file = path.toFile();
+            FileStatistics stats = analyzerService.analyze(file); // servis çağrısı
+            if (stats != null) {
+                results.put(file.getName(), stats); // thread-safe map'e ekleniyor
+            }
         }
     }
     //  Analiz sonuçlarını ekrana yazdırır
@@ -119,19 +122,19 @@ public class FileArchiverZip extends Thread {
         int totalLines = 0;
         int totalChars = 0;
 
-        System.out.println("\n📄 Dosya Analiz Sonuçları:");
+        System.out.println("\nFile Analysis Results:");
 
         for (Map.Entry<String, FileStatistics> entry : results.entrySet()) {
             String fileName = entry.getKey();
             FileStatistics stats = entry.getValue();
 
-            System.out.println(fileName + " - " + stats.getLineCount() + " satır / " + stats.getCharacterCount() + " karakter");
+            System.out.println(fileName + " - " + stats.getLineCount() + " lines / " + stats.getCharacterCount() + " characters");
 
             totalLines += stats.getLineCount();
             totalChars += stats.getCharacterCount();
         }
 
-        System.out.println("\n🧾 Toplam: " + totalLines + " satır / " + totalChars + " karakter");
+        System.out.println("🧾 Total: " + totalLines + " lines / " + totalChars + " characters\n");
     }
 
 }

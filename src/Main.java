@@ -37,7 +37,7 @@ public class Main {
 
             // Zip ve Unzip işlemleri
             long zipStart = System.nanoTime();
-            System.out.println("\n\uD83D\uDDDC\uFE0F Zip Operation");
+            System.out.println("\n\uD83D\uDDDC\uFE0F📄 Zip Operation And File Analysis Results");
             try {
                 FileArchiverZip zipThread = new FileArchiverZip(
                         Paths.get("input"),
@@ -47,7 +47,6 @@ public class Main {
                 );
                 zipThread.start();
                 zipThread.join();
-                zipThread.printResults();  // sonuçlar yazdırılıyor
             } catch (InterruptedException e) {
                 System.err.println("HATA: Zip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
