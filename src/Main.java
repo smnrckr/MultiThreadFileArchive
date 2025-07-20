@@ -13,7 +13,9 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("\n✅ Program Started");
         long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı
+
         File folder = new File("input");
+
         File[] txtFiles = folder.listFiles((dir, name) -> name.endsWith(".txt"));
 
         if (txtFiles != null) {
@@ -33,20 +35,21 @@ public class Main {
                     e.printStackTrace();
                 }
             }
+
             ResultCollector.printAllResults();
+
             // Zip ve Unzip işlemleri
             long zipStart = System.nanoTime();
             System.out.println("\n\uD83D\uDDDC\uFE0F Zip Operation");
             try {
-                // Zip thread class'ının nesnesi oluşturulur.
-                FileArchiverZip zipThread0 = new FileArchiverZip(
+                FileArchiverZip zipThread = new FileArchiverZip(
                         Paths.get("input"),
                         Paths.get("output/files.zip"),
                         semaphore,
-                        true // zipten sonra silmesi için gerekli olan parametre
+                        true
                 );
-                zipThread0.start();
-                zipThread0.join();
+                zipThread.start();
+                zipThread.join();
             } catch (InterruptedException e) {
                 System.err.println("HATA: Zip thread beklenirken hata oluştu: " + e.getMessage());
                 e.printStackTrace();
@@ -58,7 +61,6 @@ public class Main {
             long unzipStart = System.nanoTime();
             System.out.println("\n\uD83D\uDCE6 Unzip Operation");
             try {
-                // Unzip thread class'ının nesnesi oluşturulur.
                 FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                         Paths.get("output/files.zip"),
                         Paths.get("unzipped_output"),

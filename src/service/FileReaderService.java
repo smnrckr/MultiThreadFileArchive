@@ -7,7 +7,9 @@ import util.SafeFileUtils;
 public class FileReaderService {
 
     /**
-     * Verilen dosyayı okuyup tüm satırlarını dizi olarak döndürür.
+     * Verilen dosyayı okuyup tüm satırlarını dizi olarak döndürür. Okuma işlemi için SafeFileUtils kullanılır,
+     * böylece dosya okuma sırasında oluşabilecek hatalar güvenli şekilde yakalanır ve yönetilir.
+     *
      * @param file Okunacak dosya
      * @return String dizisi olarak satırlar, hata olursa null
      */
