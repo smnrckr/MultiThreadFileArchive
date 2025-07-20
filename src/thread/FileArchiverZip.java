@@ -37,6 +37,9 @@ public class FileArchiverZip extends Thread {
                 deleteFileFromZip(fileList);
             }
             System.out.println("[" + getName() + "] Zip completed -> " + outputZip);
+
+            service.ResultCollector.printAllResults();
+
         } catch (IOException | InterruptedException e) {
             System.err.println("[" + getName() + "] Error while zipping: " + e.getMessage());
             e.printStackTrace();
