@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ConcurrentHashMap;
+import model.FileStatistics;
 
 public class FileArchiverZip extends Thread {
     private final Path inputDirectory;
@@ -16,6 +20,10 @@ public class FileArchiverZip extends Thread {
     private final Semaphore semaphore;
     private final boolean deleteAfterZip;
     public static final int BUFFER_SIZE = 4096;
+
+    // Burada bu sınıf içindeki thread-safe map ile analiz sonuçlarını tutuyoruz
+    private static final ConcurrentHashMap<String, FileStatistics> results = new ConcurrentHashMap<>();
+
 
     public FileArchiverZip(Path inputDirectory, Path outputZip, Semaphore semaphore, boolean deleteAfterZip) {
         this.inputDirectory = inputDirectory;
@@ -32,6 +40,11 @@ public class FileArchiverZip extends Thread {
             System.out.println("[" + getName() + "] Zip thread started | Active threads: " + currentCount + "/10");
             // Dosyaları zip'le ve listelerini al
             List<Path> fileList = zipFiles();
+            //  Ziplenen dosyalar analiz ediliyor
+            analyzeFiles(fileList);
+            // Sonuçlar ekrana yazdırılıyor
+            printResults();
+
             // Zip sonrası dosyalar silinecek mi? Burayı silmesini istediğimiz için mainde true olarak parametre verdik
             if (deleteAfterZip) {
                 deleteFileFromZip(fileList);
@@ -92,4 +105,33 @@ public class FileArchiverZip extends Thread {
             }
         }
     }
+    // Her dosyanın satır ve karakter sayısını hesaplar
+    private void analyzeFiles(List<Path> files) throws IOException {
+        for (Path file : files) {
+            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+            int lineCount = lines.size();
+            int charCount = lines.stream().mapToInt(String::length).sum();
+            results.put(file.getFileName().toString(), new FileStatistics(lineCount, charCount));  // ✔ doğru olan bu
+        }
+    }
+    //  Analiz sonuçlarını ekrana yazdırır
+    public static void printResults() {
+        int totalLines = 0;
+        int totalChars = 0;
+
+        System.out.println("\n📄 Dosya Analiz Sonuçları:");
+
+        for (Map.Entry<String, FileStatistics> entry : results.entrySet()) {
+            String fileName = entry.getKey();
+            FileStatistics stats = entry.getValue();
+
+            System.out.println(fileName + " - " + stats.getLineCount() + " satır / " + stats.getCharacterCount() + " karakter");
+
+            totalLines += stats.getLineCount();
+            totalChars += stats.getCharacterCount();
+        }
+
+        System.out.println("\n🧾 Toplam: " + totalLines + " satır / " + totalChars + " karakter");
+    }
+
 }
