@@ -86,26 +86,23 @@ MultiThreadFileArchive/
 ---
 
 ## Örnek Konsol Çıktısı
-
-```
-Dosya: file1.txt - Satır: 100, Kelime: 500, Karakter: 3000
-Dosya: file2.txt - Satır: 80, Kelime: 400, Karakter: 2500
-...
-Toplam zip işlemi süresi: 12345678 ns (12.3 ms)
-Toplam unzip işlemi süresi: 9876543 ns (9.8 ms)
-Programın toplam çalışma süresi: 45678901 ns (45.6 ms)
-```
+<img width="957" height="1156" alt="Ekran görüntüsü 2025-07-20 205914" src="https://github.com/user-attachments/assets/3878aead-9f0a-46c1-bf52-60eb6a2c07b8" />
 
 ---
 
 ## Sınıf ve Paket Açıklamaları
 
-- **Main.java:** Uygulamanın ana akışını yönetir. Dosya işleme, arşivleme ve süre ölçümlerini başlatır.
-- **thread.FileProcessorThread:** Her bir dosya için iş parçacığı oluşturur ve dosya analizini başlatır.
+- **Main.java:** Uygulamanın ana akışını yönetir. Zip açma, dosya analiz etme, arşivleme ve süre hesaplama gibi tüm işlemlerin sırasıyla başlatıldığı yerdir.
+- **model.FileStatistics:** Dosya analizi sonucunda satır ve karakter sayısı gibi istatistikleri tutar.
 - **service.FileAnalyzerService:** Dosya analiz işlemlerini (satır, kelime, karakter sayımı vb.) gerçekleştirir.
+- **service.FileReaderService:** Dosyanın içeriğini güvenli bir şekilde okur ve satırlara ayırır.
 - **service.ResultCollector:** Analiz sonuçlarını toplar ve raporlar.
+- **thread.FileProcessorThread:** Her bir dosya için iş parçacığı oluşturur ve dosya analizini başlatır.
 - **thread.FileArchiverZip / FileArchiverUnzip:** Dosyaları arşivler ve arşivden çıkarır.
+- **thread.ThreadMonitor:** Tüm iş parçacıklarının durumunu ve tamamlanma sürelerini takip eder.
 - **util.SafeFileUtils:** Dosya işlemlerinde güvenli yardımcı metotlar sağlar.
+- **worker.Worker:** Tek bir dosya üzerinde analiz işlemini gerçekleştiren sınıftır. FileAnalyzerService üzerinden analiz yapar ve sonucu ResultCollector ile toplar.
+
 
 ---
 
