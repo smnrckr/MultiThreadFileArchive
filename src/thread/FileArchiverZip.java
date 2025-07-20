@@ -12,6 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
+import model.FileStatistics;
 
 public class FileArchiverZip extends Thread {
     private final Path inputDirectory;
@@ -23,24 +24,7 @@ public class FileArchiverZip extends Thread {
     // Burada bu sınıf içindeki thread-safe map ile analiz sonuçlarını tutuyoruz
     private static final ConcurrentHashMap<String, FileStatistics> results = new ConcurrentHashMap<>();
 
-    //line + char sayısı tutar
-    private static class FileStatistics {
-        private final int lineCount;
-        private final int charCount;
 
-        public FileStatistics(int lineCount, int charCount) {
-            this.lineCount = lineCount;
-            this.charCount = charCount;
-        }
-
-        public int getLineCount() {
-            return lineCount;
-        }
-
-        public int getCharCount() {
-            return charCount;
-        }
-    }
     public FileArchiverZip(Path inputDirectory, Path outputZip, Semaphore semaphore, boolean deleteAfterZip) {
         this.inputDirectory = inputDirectory;
         this.outputZip = outputZip;
@@ -141,10 +125,10 @@ public class FileArchiverZip extends Thread {
             String fileName = entry.getKey();
             FileStatistics stats = entry.getValue();
 
-            System.out.println(fileName + " - " + stats.getLineCount() + " satır / " + stats.getCharCount() + " karakter");
+            System.out.println(fileName + " - " + stats.getLineCount() + " satır / " + stats.getCharacterCount() + " karakter");
 
             totalLines += stats.getLineCount();
-            totalChars += stats.getCharCount();
+            totalChars += stats.getCharacterCount();
         }
 
         System.out.println("\n🧾 Toplam: " + totalLines + " satır / " + totalChars + " karakter");
