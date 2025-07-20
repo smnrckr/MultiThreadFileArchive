@@ -40,7 +40,7 @@ public class FileArchiverUnzip extends Thread {
             // İşlem bitince semaforu serbest bırak
             long endTime = System.nanoTime(); // Unzip işlemi bitişi
             long duration = endTime - startTime;
-            System.out.println("[" + getName() + "] Unzip işlemi süresi: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
+            System.out.println("[" + getName() + "] Unzip duration: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
             semaphore.release();
             int activeCount = ThreadMonitor.activeThreads.decrementAndGet();
             System.out.println("[" + getName() + "] Unzip thread finished | Active threads: " + activeCount + "/10");

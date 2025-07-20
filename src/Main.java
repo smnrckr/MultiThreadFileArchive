@@ -4,7 +4,6 @@ import thread.FileProcessorThread;
 import service.ResultCollector;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,7 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println("\n✅ Program Started");
         long programStart = System.nanoTime(); // Programın toplam çalışma süresi başlangıcı
 
         File folder = new File("input");
@@ -40,6 +40,7 @@ public class Main {
 
             // Zip ve Unzip işlemleri
             long zipStart = System.nanoTime();
+            System.out.println("\n\uD83D\uDDDC\uFE0F Zip Operation");
             try {
                 FileArchiverZip zipThread = new FileArchiverZip(
                         Paths.get("input"),
@@ -55,9 +56,10 @@ public class Main {
             }
             long zipEnd = System.nanoTime();
             long zipDuration = zipEnd - zipStart;
-            System.out.println("Toplam zip işlemi süresi: " + zipDuration + " ns (" + (zipDuration / 1_000_000.0) + " ms)");
+            System.out.println("Total zip duration: " + zipDuration + " ns (" + (zipDuration / 1_000_000.0) + " ms)");
 
             long unzipStart = System.nanoTime();
+            System.out.println("\n\uD83D\uDCE6 Unzip Operation");
             try {
                 FileArchiverUnzip unzipThread = new FileArchiverUnzip(
                         Paths.get("output/files.zip"),
@@ -72,10 +74,11 @@ public class Main {
             }
             long unzipEnd = System.nanoTime();
             long unzipDuration = unzipEnd - unzipStart;
-            System.out.println("Toplam unzip işlemi süresi: " + unzipDuration + " ns (" + (unzipDuration / 1_000_000.0) + " ms)");
+            System.out.println("Total unzip duration: " + unzipDuration + " ns (" + (unzipDuration / 1_000_000.0) + " ms)");
             long programEnd = System.nanoTime();
             long programDuration = programEnd - programStart;
-            System.out.println("Programın toplam çalışma süresi: " + programDuration + " ns (" + (programDuration / 1_000_000.0) + " ms)");
+            System.out.println("\n\uD83C\uDFC1 Program Completed");
+            System.out.println("Total program runtime: " + programDuration + " ns (" + (programDuration / 1_000_000.0) + " ms)");
 
         } else {
             System.out.println("No files found in input folder.");

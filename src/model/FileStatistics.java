@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Bu sınıf, bir dosya analizinden elde edilen istatistikleri temsil eder:
+ * - Satır sayısı
+ * - Karakter sayısı
+ */
 public class FileStatistics {
     private final int lineCount;
     private final int characterCount;
@@ -19,6 +24,6 @@ public class FileStatistics {
 
     @Override
     public String toString() {
-        return lineCount + " satır / " + characterCount + " karakter";
+        return lineCount + " lines / " + characterCount + " characters";
     }
 }
