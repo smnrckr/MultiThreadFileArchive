@@ -1,4 +1,0 @@
-Java is powerful.
-Multithreading enables concurrent execution.
-Clean code is readable and maintainable.
-This file is used for testing line and character count.

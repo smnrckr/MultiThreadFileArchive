@@ -1,3 +1,6 @@
+output/
+input/
+unzipped_output/
 ### IntelliJ IDEA ###
 .idea/
 *.iml

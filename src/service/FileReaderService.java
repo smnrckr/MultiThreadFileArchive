@@ -1,14 +1,16 @@
 package service;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import util.SafeFileUtils;
 
 public class FileReaderService {
 
+    /**
+     * Verilen dosyayı okuyup tüm satırlarını dizi olarak döndürür.
+     * @param file Okunacak dosya
+     * @return String dizisi olarak satırlar, hata olursa null
+     */
     public String[] readAllLines(File file) {
         List<String> lines = SafeFileUtils.readAllLinesSafe(file);
         if (lines == null) {

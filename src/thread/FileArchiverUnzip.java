@@ -25,15 +25,19 @@ public class FileArchiverUnzip extends Thread {
     public void run() {
         long startTime = System.nanoTime(); // Unzip işlemi başlangıcı
         try {
+            // Thread başlarken semafor al
             semaphore.acquire();
+            // Aktif thread sayısını güncelle
             int activeCount = ThreadMonitor.activeThreads.incrementAndGet();
             System.out.println("[" + getName() + "] Unzip thread started | Active threads: " + activeCount + "/10");
+            // Unzip işlemini başlat
             unzipFiles();
             System.out.println("[" + getName() + "] Unzip completed -> " + outputDirectory);
         } catch (InterruptedException | IOException e) {
-            System.err.println("[" + getName() + "] HATA: Unzip işlemi sırasında hata oluştu: " + e.getMessage());
+            System.err.println("[" + getName() + "] Error while unzipping: " + e.getMessage());
             e.printStackTrace();
         } finally {
+            // İşlem bitince semaforu serbest bırak
             long endTime = System.nanoTime(); // Unzip işlemi bitişi
             long duration = endTime - startTime;
             System.out.println("[" + getName() + "] Unzip duration: " + duration + " ns (" + (duration / 1_000_000.0) + " ms)");
@@ -43,30 +47,41 @@ public class FileArchiverUnzip extends Thread {
         }
     }
     private void unzipFiles() throws IOException {
+        // Hedef klasör yoksa oluştur
         if (Files.notExists(outputDirectory)) {
             Files.createDirectories(outputDirectory);
         }
-        try(ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
+        // Zip dosyasını okuma akışına çevir
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
             ZipEntry zipEntry;
+            // Zip içindeki her ögeyi sırayla işle
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                // Hedef dosya/klasör yolunu oluştur
                 Path filePath = outputDirectory.resolve(zipEntry.getName());
                 if (zipEntry.isDirectory()) {
+                    // Eğer klasörse hedefte oluştur
                     Files.createDirectories(filePath);
                     System.out.println("[" + getName() + "] Created directory: " + filePath);
                 } else {
+                    // Dosya ise önce klasörünü oluştur, sonra kopyala
                     Files.createDirectories(filePath.getParent());
                     copyFiles(zipInputStream, filePath);
-                    System.out.println("[" + getName() + "] Created directory: " + filePath);
+                    System.out.println("[" + getName() + "] Extracted file: " + filePath);
                 }
                 zipInputStream.closeEntry();
             }
         }
     }
     private void copyFiles(InputStream inputStream, Path outpath) throws IOException {
-        try(OutputStream outputStream = Files.newOutputStream(outpath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)){
-            byte[] buffer = new byte[FileArchiverZip.BUFFER_SIZE];
+        // Zipten okunan dosya içeriğini hedefe yaz
+        try (OutputStream outputStream = Files.newOutputStream(outpath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+        )) {
+            byte[] buffer = new byte[FileArchiverZip.BUFFER_SIZE]; // Okuma/yazma için buffer
             int length;
-            while ((length = inputStream.read(buffer)) >0) {
+            // Zip akışından parça parça oku(yukarıda görüldüğü gibi 4kb verdik) ve hedef dosyaya yaz
+            while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
         }
